@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+    <h1>HTML FILE...</h1>
+
+    <div class="inputDiv">
+        <input type="text" id="input">
+        <button id="sendBtn">Send</button>
+    </div>
+
+    <div class="privateDiv">
+        대상: <input type="text" id="target">
+        비밀메시지: <input type="text" id="content">
+        <button id="pBtn">Send Secret Message</button>
+    </div>
+
+    <div class="chatDiv">
+        <ul>
+
+        </ul>
+    </div>
+
+    <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        var nickName = prompt("닉네임을 입력해주세요");
+
+        var socket = io('http://192.168.0.108:8000/');
+
+        socket.emit("setNickname", nickName);
+
+        var input = $("#input");
+
+        var chatUL = $(".chatDiv ul");
+
+        socket.on("smsg", function(e){
+            console.log(e);
+            chatUL.append("<li>"+ e +"</li>")
+        });
+
+        var target = $("#target");
+        var content = $("#content");
+
+        $("#pBtn").on("click", function(){
+            console.log("클릭됨");
+            var msgObj = {target:target.val(),
+                          content:content.val()};
+            socket.emit("pmsg", msgObj);
+            target.val("");
+            content.val("");
+        });
+
+        $("#sendBtn").on("click", function(){
+
+            socket.emit("msg", input.val());
+            input.val("");
+
+        });
+
+        //socket.emit("greet", "Hello Server");
+    </script>
+
+</body>
+</html>
